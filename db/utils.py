@@ -69,6 +69,10 @@ def attach_item_to_user(user_id: str, item: models.Item):
     """Attaches an item to a user in the database."""
     if not user_id or not item.id:
         return
+    # Attach item to user if it doesn't already exist
+    users_item = database.UsersItem.query.filter_by(user_id=user_id, item_id=item.id).first()
+    if users_item:
+        return
     users_item = database.UsersItem(user_id=user_id, item_id=item.id)
     db.session.add(users_item)
     db.session.commit()

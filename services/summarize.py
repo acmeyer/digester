@@ -79,7 +79,7 @@ def get_summary(full_text: str, model: str = DEFAULT_SUMMARY_MODEL, type: str = 
     if type == "detailed":
         user_input = f"Here's the content you should summarize:\n\n{full_text}\n\n----\n\nI would like you to produce a detailed summary of this content."
     else:
-        user_input = f"Here's the content you should summarize:\n\n{full_text}\n\n----\n\nI would like you to produce a short summary of this content. It should be a few sentences at most."
+        user_input = f"Here's the content you should summarize:\n\n{full_text}\n\n----\n\nI would like you to produce a short summary of this content. It should be no more than two paragraphs."
     conversation_messages.append(Message(role="user", text=user_input))
     return get_chat_completion(prompt, conversation_messages, model=model)
 
@@ -150,6 +150,10 @@ def create_summary(
     user_id: str = None,
     model: str = DEFAULT_SUMMARY_MODEL
 ) -> Item:
+    item = get_item_by_source_url(url)
+    if item:
+        return Item.from_orm(item)
+
     if file:
         full_text = get_document_from_file(file)
         full_text = full_text.strip()
@@ -177,9 +181,6 @@ def create_summary(
         item_id = save_item_to_database(item)
         item.id = item_id
     elif url:
-        item = get_item_by_source_url(url)
-        if item:
-            return item
         metadata = get_metadata_from_url(url)
         item = Item(
             source_url=url, 
@@ -213,12 +214,12 @@ def create_summary(
             summaries.append(summary)
             documents_for_embedding.append(content)
         all_summaries = "\n\n".join(summaries)
-        full_response = get_summary(all_summaries, model=GPT_4_MODEL, type="detailed")
+        full_response = get_summary(all_summaries, model=GPT_4_MODEL, type="short")
         item.summary = full_response
         update_item_summary(item_id, full_response)
         response = full_response
     else:
-        response = get_summary(full_text, model=GPT_4_MODEL, type="detailed")
+        response = get_summary(full_text, model=GPT_4_MODEL, type="short")
         content = Content(
             item_id=item_id,
             text=full_text,
