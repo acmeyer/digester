@@ -2,6 +2,11 @@
 
 This is a simple app for generating summaries of articles and documents and then asking follow-up questions. This is just a prototype. There are numerous ways it could be improved.
 
+## Demo
+
+https://github.com/acmeyer/digester/assets/852932/c059f2a1-7234-49c7-a572-7c1e309173b6
+
+
 ## How to Use
 
 This application has three main components:
